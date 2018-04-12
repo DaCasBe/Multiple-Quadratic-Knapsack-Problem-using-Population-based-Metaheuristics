@@ -40,7 +40,19 @@ protected:
 		 *
 		 * 2. Repetir (_k-1) veces la selección de otra solución aleatoria y el torneo con la actualmente ganadora (mantener la mejor)
 		 */
-		...
+		Solution * best;
+
+		best=set[rand()%set.size()];
+
+		for(int i=0;i<_k-1;i++){
+			Solution * sol;
+			sol=set[rand()%set.size()];
+
+			if(sol.getFitness()>best.getFitness()){
+				best=sol;
+			}
+		}
+
 		return best;
 	}
 
