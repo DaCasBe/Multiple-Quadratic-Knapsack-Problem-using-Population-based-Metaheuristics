@@ -80,7 +80,16 @@ public:
 
 		//TODO utilizando le método propio selectOne, seleccionar tantas parejas
 		//de padres como elementos hay en orig
-		...
+		vector <Solution*> set;
+		set.resize(0);
+
+		for(int i=0;i<2*orig.size();i++){
+			for(int j=0;j<_k;j++){
+				set[j]=orig[rand()%orig.size()];
+			}
+
+			result[i]=selectOne(set);
+		}
 	}
 };
 

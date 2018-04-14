@@ -61,7 +61,15 @@ protected:
 	unsigned indexBest(vector<Solution*> &set) {
 
 		//TODO buscar el índice de la mejor solución en set
-		...
+		Solution * best=set[0];
+		unsigned indexBest=0;
+
+		for(int i=1;i<set.size();i++){
+			if(set[i].getFitness()>best.getFitness()){
+				best=set[i];
+				indexBest=i;
+			}
+		}
 
 		return indexBest;
 	}
@@ -74,7 +82,15 @@ protected:
 	unsigned indexWorst(vector<Solution*> &set) {
 
 		//TODO buscar el índice de la peor solución en set
-		...
+		Solution * worst=set[0];
+		unsigned indexWorst=0;
+
+		for(int i=1;i<set.size();i++){
+			if(set[i].getFitness()<worst.getFitness()){
+				worst=set[i];
+				indexWorst=i;
+			}
+		}
 
 		return indexWorst;
 	}
@@ -100,9 +116,11 @@ protected:
 		 * 5. Almacenar los individuos de offspring en la población actual
 		 */
 		unsigned int indexBestPop = indexBest(_population);
-		unsigned int indexBestOff = ...
+		unsigned int indexBestOff = indexBest(offspring);
 
-		...
+		if(_population[indexBestPop].getFitness()>offspring[indexBestOff].getFitness()){
+			offspring[indexWorst(offspring)]=_population[indexBestPop];
+		}
 
 		//Eliminar los individuos de la población actual
 		for (unsigned i = 0; i < _popSize; i++) {
