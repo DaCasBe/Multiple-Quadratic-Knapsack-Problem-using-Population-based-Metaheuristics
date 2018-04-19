@@ -52,7 +52,7 @@ protected:
 			//con la misma probabilidad, para cada gen
 			int parent;
 
-			for(i=0;i<_numObjs;i++){
+			for(unsigned i=0;i<_numObjs;i++){
 				parent=(rand()%2)+1;
 
 				if(parent==1){
@@ -94,7 +94,7 @@ public:
 		unsigned numParents = (unsigned) parents.size();
 
 		//TODO aplicar cruce entre cada dos padres consecutivos (1,2), (3,4), ...
-		for (int i=0;i<numParents;i=i+2) {
+		for (unsigned i=0;i<numParents;i=i+2) {
 			if(i+1<_numObjs){
 				MQKPSolution *sol = cross(parents[i],parents[i+1]);
 				offspring.push_back(sol);

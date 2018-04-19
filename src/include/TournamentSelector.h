@@ -44,11 +44,11 @@ protected:
 
 		best=set[rand()%set.size()];
 
-		for(int i=0;i<_k-1;i++){
+		for(unsigned i=0;i<_k-1;i++){
 			Solution * sol;
 			sol=set[rand()%set.size()];
 
-			if(sol.getFitness()>best.getFitness()){
+			if(sol->getFitness()>best->getFitness()){
 				best=sol;
 			}
 		}
@@ -83,8 +83,8 @@ public:
 		vector <Solution*> set;
 		set.resize(0);
 
-		for(int i=0;i<2*orig.size();i++){
-			for(int j=0;j<_k;j++){
+		for(unsigned i=0;i<2*orig.size();i++){
+			for(unsigned j=0;j<_k;j++){
 				set[j]=orig[rand()%orig.size()];
 			}
 

@@ -65,7 +65,7 @@ protected:
 		unsigned indexBest=0;
 
 		for(int i=1;i<set.size();i++){
-			if(set[i].getFitness()>best.getFitness()){
+			if(set[i]->getFitness()>best->getFitness()){
 				best=set[i];
 				indexBest=i;
 			}
@@ -86,7 +86,7 @@ protected:
 		unsigned indexWorst=0;
 
 		for(int i=1;i<set.size();i++){
-			if(set[i].getFitness()<worst.getFitness()){
+			if(set[i]->getFitness()<worst->getFitness()){
 				worst=set[i];
 				indexWorst=i;
 			}
@@ -118,7 +118,7 @@ protected:
 		unsigned int indexBestPop = indexBest(_population);
 		unsigned int indexBestOff = indexBest(offspring);
 
-		if(_population[indexBestPop].getFitness()>offspring[indexBestOff].getFitness()){
+		if(_population[indexBestPop]->getFitness()>offspring[indexBestOff]->getFitness()){
 			offspring[indexWorst(offspring)]=_population[indexBestPop];
 		}
 
