@@ -64,7 +64,7 @@ protected:
 		Solution * best=set[0];
 		unsigned indexBest=0;
 
-		for(int i=1;i<set.size();i++){
+		for(unsigned i=1;i<set.size();i++){
 			if(set[i]->getFitness()>best->getFitness()){
 				best=set[i];
 				indexBest=i;
@@ -85,7 +85,7 @@ protected:
 		Solution * worst=set[0];
 		unsigned indexWorst=0;
 
-		for(int i=1;i<set.size();i++){
+		for(unsigned i=1;i<set.size();i++){
 			if(set[i]->getFitness()<worst->getFitness()){
 				worst=set[i];
 				indexWorst=i;
@@ -118,7 +118,7 @@ protected:
 		unsigned int indexBestPop = indexBest(_population);
 		unsigned int indexBestOff = indexBest(offspring);
 
-		if(_population[indexBestPop]->getFitness()>offspring[indexBestOff]->getFitness()){
+		if(MQKPEvaluator::compare(_population[indexBestPop]->getFitness(),offspring[indexBestOff]->getFitness())>0){
 			offspring[indexWorst(offspring)]=_population[indexBestPop];
 		}
 
@@ -145,6 +145,7 @@ protected:
 
 		for (Solution *sol : set) {
 			MQKPSolution *s = (MQKPSolution*) sol;
+			double fitness;
 
 			/**
 			 * TODO
@@ -155,7 +156,7 @@ protected:
 			if (!(s->hasValidFitness())) {
 
 				//Evaluar
-				...
+				fitness=MQKPEvaluator::computeFitness(*_instance,*s);
 				_results.push_back(fitness);
 				s->setFitness(fitness);
 
@@ -187,8 +188,14 @@ protected:
 		 * 3. Actualizar la mejor solución _bestSolution
 		 * 4. Insertarlas en la población
 		 */
+		MQKPSolution *sol;
+		sol=new MQKPSolution(*_instance);
+		double fitness;
+
 		for (unsigned i = 0; i < popSize; i++) {
-			...
+			MQKPSolGenerator::genRandomSol(*_instance,*sol);
+			fitness=MQKPEvaluator::computeFitness(*_instance,*sol);
+
 			_results.push_back(fitness);
 			_population.push_back(sol);
 		}

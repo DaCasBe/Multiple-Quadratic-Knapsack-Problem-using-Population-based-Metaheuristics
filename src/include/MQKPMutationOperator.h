@@ -29,7 +29,7 @@ protected:
 	 */
 	double _mutProb;
 	unsigned _numObjs;
-	unsigned _numKnapsakcs;
+	unsigned _numKnapsacks;
 
 	/**
 	 * Función que muta una solución
@@ -42,7 +42,7 @@ protected:
 		//asignarlos a una mochila aleatoria (podrían modificarse 0, 1, o más de 1 gen)
 		for(unsigned i=0;i<_numObjs;i++){
 			if((rand()/RAND_MAX)<_mutProb){
-				sol->putObjectIn(i,(rand()%_numKnapsacks)+1);
+				s->putObjectIn(i,(rand()%_numKnapsacks)+1);
 			}
 		}
 	}

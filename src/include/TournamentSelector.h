@@ -48,7 +48,7 @@ protected:
 			Solution * sol;
 			sol=set[rand()%set.size()];
 
-			if(sol->getFitness()>best->getFitness()){
+			if(compare(sol->getFitness(),best->getFitness())>0){
 				best=sol;
 			}
 		}
@@ -85,7 +85,7 @@ public:
 
 		for(unsigned i=0;i<2*orig.size();i++){
 			for(unsigned j=0;j<_k;j++){
-				set[j]=orig[rand()%orig.size()];
+				set.push_back(orig[rand()%orig.size()]);
 			}
 
 			result[i]=selectOne(set);

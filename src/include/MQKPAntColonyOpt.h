@@ -57,9 +57,11 @@ class MQKPAntColonyOpt: public MQKPMetaheuristic {
 			//TODO devolver la suma de los elementos en significances
 
 			double sum=0;
+
 			for(unsigned i=0;i<significances.size();i++){
 				sum+=significances[i];
 			}
+
 			return sum;
 		}
 
@@ -145,7 +147,7 @@ class MQKPAntColonyOpt: public MQKPMetaheuristic {
 						j++) {
 
 					//TODO Si el movimiento viola la capacidad de la mochila, descartarlo
-					...
+
 					double maxViolation =
 							instance->getDeltaMaxCapacityViolation(*_sol,
 									indexObj, j);
@@ -154,13 +156,13 @@ class MQKPAntColonyOpt: public MQKPMetaheuristic {
 						continue;
 
 					//TODO Obtener el deltaFitness y contarlo como un intento (como no viola, será iguala a DeltaSumProfits)
-					...
+
 					double deltaFitness = instance->getDeltaSumProfits(*_sol,
 							indexObj, j);
 					numTries++;
 
 					//TODO Saltarse las opciones a peor o nulas (no debieran ocurrir si no hay profits negativos, "pero pa por si")
-					...
+
 					if (deltaFitness <= 0)
 						continue;
 
