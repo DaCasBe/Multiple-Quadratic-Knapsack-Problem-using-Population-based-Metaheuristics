@@ -116,8 +116,8 @@ class MQKPAntColonyOpt: public MQKPMetaheuristic {
 					 */
 					MQKPObjectAssignmentOperation *al =
 							new MQKPObjectAssignmentOperation();
-					double density = ...
-					...
+					double density = deltaFitness/instance->getWeight(indexObj);
+					//double relevance=pow(density,beta)*pow(phMatrix[indexObj][j],alpha);
 				}
 			}
 		}

@@ -265,7 +265,7 @@ public:
 		 * 3. Almacenar la media de la poblaciónfinal y la mejor solución
 		 */
 
-		initPop...
+		initPopulation(_popsize);
 
 		while (stopCondition.reached() == false) {
 
@@ -274,14 +274,19 @@ public:
 					_population.at(indexBest(_population))->getFitness());
 
 			vector<Solution*> parents;
-			_selector->...
+			_selector->select(_population,parents);
 
 			vector<Solution*> offspring;
-			...
+			_crossoverOp->cross(parents,offspring);
 
 			_offMeanResults.push_back(computeMeanFitness(offspring));
 
-			...
+			_mutOp->mutate(offspring);
+
+			computeMeanFitness(offspring);
+
+			selectNewPopulation(offspring);
+
 			stopCondition.notifyIteration();
 		}
 
