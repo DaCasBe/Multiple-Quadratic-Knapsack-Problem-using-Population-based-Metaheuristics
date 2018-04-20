@@ -222,6 +222,12 @@ class MQKPAntColonyOpt: public MQKPMetaheuristic {
 			 * 2. Asignarle un fitness igual a cero
 			 */
 			...
+			MQKPInstance *instance = _colony->_instance;
+			unsigned numKnapsacks = instance->getNumKnapsacks();
+			for(int i=0;i<numKnapsacks;i++){
+				_objectsLeft->putObjectIn(i,0);
+				
+			}
 		}
 
 		/**
