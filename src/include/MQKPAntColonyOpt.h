@@ -322,7 +322,7 @@ protected:
 	 * @param[in] op Opción que escogió la hormiga y donde se va a aplicar la actualización
 	 */
 	void localUpdate(MQKPObjectAssignmentOperation &op) {
-		...
+		// ? Ni idea de que diapositivas habla
 	}
 
 	/**
@@ -336,7 +336,8 @@ protected:
 
 		//TODO Resetear las soluciones de cada hormiga e insertar sus índices en movingAnts
 		for (auto ant : _ants) {
-			...
+			_ants[i]->resetSolution();
+			movingAnts.insert(i);  // ? No estoy seguro si sus indices es i o ant
 			i++;
 		}
 
@@ -349,13 +350,14 @@ protected:
 				MQKPAnt *ant = _ants[iAnt];
 				MQKPObjectAssignmentOperation op;
 				op.setValues(-1, -1, 0);
-				...
+				
+				// ?  Aqui habia 3 puntos como si tuviesemos que completar con alguna funcion
 
 				//TODO Si la hormiga se ha movido, entonces aplicar la actualización local de feromona. Si no, apuntarla en stoppedAnts para eliminarla después de movingAnts
-				if (...) {
-					...
+				if (op.getObj() > -1) {
+					localUpdate(op);
 				} else {
-					...
+					stoppedAnts.insert(iAnt);
 				}
 			}
 
@@ -410,7 +412,7 @@ protected:
 	void iterate() {
 
 		//TODO Liberar las hormigas
-		...
+		releaseAnts();
 		saveStatistics();
 
 		//aplicar pheromona con la mejor solución
@@ -419,7 +421,10 @@ protected:
 
 		//TODO Para cada objeto, depositar feromona en el par objeto y mochila en la que está dicho objeto.
 		for (unsigned i = 0; i < numObjs; i++) {
-			...
+			// ? Despues de investigar (y si lo he entendido bien) lo que hay que hacer aqui es recorer la matriz de pheromonas y actualizarla, para ello accedemos 
+			// ? al objeto de la lista i y cambiamos la posicion de la mejor solucion por la soluccion ya existente + fitness actualizado con la evaopacion   
+			_phMatrix[i][_bestSolution->whereIsObject(i)] = (1 - _evaporation) * _phMatrix[i][_bestSolution->whereIsObject(i)] + fitness;
+
 		}
 	}
 
@@ -502,7 +507,9 @@ public:
 
 		//TODO Creación de las hormigas
 		for (unsigned i = 0; i < numAnts; i++) {
-			...
+			// ? Aqui se crea nuevas hormigas, a la creacion de hormigas se le pasa una lista de candidatos y una colona, pongo this para referirme a la colonia actual ya que no encuentro otra forma
+			MQKPAnt *hormiga = new MQKPAnt(candidateListSize, this);
+			_ants.push_back(hormiga);
 		}
 
 
@@ -512,10 +519,11 @@ public:
 
 		for (unsigned i = 0; i < numObjs; i++) {
 			vector<double> *aVector = new vector<double>;
-			_phMatrix.push_back(aVector);
+			_phMatrix.push_back(aVector);						// ? No entiendo esto
 
 			for (unsigned j = 0; j < numKnapsacks; j++) {
-				aVector->push_back(...);
+				// ? Aqui tenemos que poner el valor de pheromona inicial que se da como initTau, la cosa es que segun pone arriba en el protected no nos interesa que sea 0 y justo en la linea de antes mete en phMatrix un valor basura
+				aVector->push_back(_initTau);
 			}
 		}
 	}
@@ -533,7 +541,7 @@ public:
 
 		//TODO Mientras no se llegue a la condición de parada, iterar
 		while (stopCondition.reached() == false) {
-			...
+			iterate()
 			stopCondition.notifyIteration();
 		}
 	}
