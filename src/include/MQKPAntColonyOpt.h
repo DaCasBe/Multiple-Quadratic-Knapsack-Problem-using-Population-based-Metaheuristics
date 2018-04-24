@@ -328,7 +328,9 @@ protected:
 	 * @param[in] op Opción que escogió la hormiga y donde se va a aplicar la actualización
 	 */
 	void localUpdate(MQKPObjectAssignmentOperation &op) {
-		// ? Ni idea de que diapositivas habla
+		// ? 1 menos evaparcion por la feromona en el instante anterior mas la evaporacion por el fitness de la inicial (alomejor me he liado con tanto parentesis)
+		*_phMatrix[op.getObj()][_bestSolution->whereIsObject(op.getObj())] = (1-_evaporation) * (*_phMatrix[_bestSolution->whereIsObject(op.getObj())])[(_evaporation + _initTau)];
+
 	}
 
 	/**
@@ -428,8 +430,8 @@ protected:
 		//TODO Para cada objeto, depositar feromona en el par objeto y mochila en la que está dicho objeto.
 		for (unsigned i = 0; i < numObjs; i++) {
 			// ? Despues de investigar (y si lo he entendido bien) lo que hay que hacer aqui es recorer la matriz de pheromonas y actualizarla, para ello accedemos 
-			// ? al objeto de la lista i y cambiamos la posicion de la mejor solucion por la soluccion ya existente + fitness actualizado con la evaopacion   
-			_phMatrix[i][_bestSolution->whereIsObject(i)] = (1 - _evaporation) * _phMatrix[i][_bestSolution->whereIsObject(i)] + fitness;
+			// ? al objeto de la lista i y cambiamos la posicion de la mejor solucion por 1 menos evaparcion por la feromona en el instante anterior mas la evaporacion por el fitness de la mejor hormiga
+			_phMatrix[i][_bestSolution->whereIsObject(i)] = (1 - _evaporation) * (*_phMatrix[i])[_bestSolution->whereIsObject(i)] + _evaluation * fitness;
 
 		}
 	}
