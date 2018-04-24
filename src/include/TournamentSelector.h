@@ -48,7 +48,7 @@ protected:
 			Solution * sol;
 			sol=set[rand()%set.size()];
 
-			if(compare(sol->getFitness(),best->getFitness())>0){
+			if(MQKPEvaluator::compare(sol->getFitness(),best->getFitness())>0){
 				best=sol;
 			}
 		}

@@ -118,7 +118,10 @@ class MQKPAntColonyOpt: public MQKPMetaheuristic {
 							new MQKPObjectAssignmentOperation();
 					double density = deltaFitness/instance->getWeight(indexObj);
 					//double relevance=pow(density,beta)*pow(phMatrix[indexObj][j],alpha);
-				}
+					double relevancia=pow(phMatrix[indexObj]->at(numKnapsacks),alpha)*pow(density,beta);
+					significances.push_back(relevancia);
+					alternatives.push_back(al);
+;				}
 			}
 		}
 
@@ -172,7 +175,12 @@ class MQKPAntColonyOpt: public MQKPMetaheuristic {
 					 * 1. Calcular su relevancia como la densidad del objeto^beta * cantidadPheromona[objeto][mochila]^alpha
 					 * 2. Si es mejor que la mejor hasta ahora, guardarla en op
 					 */
-					...
+					double density = deltaFitness/instance->getWeight(indexObj); //Es el valor heuristico
+					double relevancia=pow(phMatrix[indexObj]->at(j),alpha)*pow(density,beta);
+					if(bestSignificance<relevancia){
+						bestSignificance=relevancia;
+						op.setValues(indexObj,j,deltaFitness);
+					}
 				}
 			}
 		}
@@ -221,13 +229,18 @@ class MQKPAntColonyOpt: public MQKPMetaheuristic {
 			 * 1. Asignar todos los objetos a la mochila 0 e insertarlos en la memoria _objectsLeft
 			 * 2. Asignarle un fitness igual a cero
 			 */
-			...
+
 			MQKPInstance *instance = _colony->_instance;
 			unsigned numKnapsacks = instance->getNumKnapsacks();
-			for(int i=0;i<numKnapsacks;i++){
-				_objectsLeft->putObjectIn(i,0);
-				
+			_objectsLeft.clear();
+			_sol->setFitness(0);
+			for(unsigned i=0;i<numKnapsacks;i++){
+
+				_sol->putObjectIn(i,0);
+				_objectsLeft.insert(i);
 			}
+
+
 		}
 
 		/**
@@ -252,7 +265,6 @@ class MQKPAntColonyOpt: public MQKPMetaheuristic {
 				if (significances.size() <= 0) {
 					return;
 				}
-
 				//TODO Elegir una de las alternativas según probabilidades proporcionales a sus relevancias
 				double v_sumSignificances = sumSignificances(significances);
 				double randSample = (((double) rand()) / RAND_MAX)
@@ -260,8 +272,9 @@ class MQKPAntColonyOpt: public MQKPMetaheuristic {
 				randSample -= significances.at(0);
 				unsigned opSelected = 0;
 
-				while (...) {
-					...
+				while (randSample>0) {
+					opSelected++;
+					randSample -= significances.at(opSelected);
 				}
 
 				//Asignar la alternativa elegida en operation
@@ -278,7 +291,8 @@ class MQKPAntColonyOpt: public MQKPMetaheuristic {
 
 			//TODO Si se seleccionó alguna alternativa, aplicarla a la solución y eliminar el objeto correspondiente de _objectsLeft
 			if (operation.getObj() >= 0) {
-				...
+				operation.apply(getSolution());
+				_objectsLeft.erase(operation.getKnapsack());
 			}
 		}
 
@@ -329,8 +343,7 @@ protected:
 	 */
 	void localUpdate(MQKPObjectAssignmentOperation &op) {
 		// ? 1 menos evaparcion por la feromona en el instante anterior mas la evaporacion por el fitness de la inicial (alomejor me he liado con tanto parentesis)
-		*_phMatrix[op.getObj()][_bestSolution->whereIsObject(op.getObj())] = (1-_evaporation) * (*_phMatrix[_bestSolution->whereIsObject(op.getObj())])[(_evaporation + _initTau)];
-
+		(*_phMatrix[op.getObj()])[op.getKnapsack()] =  (1 - _evaporation) * (*_phMatrix[op.getObj()])[op.getKnapsack()] + _evaporation * _initTau;
 	}
 
 	/**
@@ -344,7 +357,7 @@ protected:
 
 		//TODO Resetear las soluciones de cada hormiga e insertar sus índices en movingAnts
 		for (auto ant : _ants) {
-			_ants[i]->resetSolution();
+			ant->resetSolution();
 			movingAnts.insert(i);  // ? No estoy seguro si sus indices es i o ant
 			i++;
 		}
@@ -360,7 +373,7 @@ protected:
 				op.setValues(-1, -1, 0);
 				
 				// ?  Aqui habia 3 puntos como si tuviesemos que completar con alguna funcion
-
+					ant->chooseOperation(op);
 				//TODO Si la hormiga se ha movido, entonces aplicar la actualización local de feromona. Si no, apuntarla en stoppedAnts para eliminarla después de movingAnts
 				if (op.getObj() > -1) {
 					localUpdate(op);
@@ -431,7 +444,7 @@ protected:
 		for (unsigned i = 0; i < numObjs; i++) {
 			// ? Despues de investigar (y si lo he entendido bien) lo que hay que hacer aqui es recorer la matriz de pheromonas y actualizarla, para ello accedemos 
 			// ? al objeto de la lista i y cambiamos la posicion de la mejor solucion por 1 menos evaparcion por la feromona en el instante anterior mas la evaporacion por el fitness de la mejor hormiga
-			_phMatrix[i][_bestSolution->whereIsObject(i)] = (1 - _evaporation) * (*_phMatrix[i])[_bestSolution->whereIsObject(i)] + _evaluation * fitness;
+			(*_phMatrix[i])[_bestSolution->whereIsObject(i)] = (1 - _evaporation) * (*_phMatrix[i])[_bestSolution->whereIsObject(i)] + _evaporation * fitness;
 
 		}
 	}
@@ -549,7 +562,7 @@ public:
 
 		//TODO Mientras no se llegue a la condición de parada, iterar
 		while (stopCondition.reached() == false) {
-			iterate()
+			iterate();
 			stopCondition.notifyIteration();
 		}
 	}
