@@ -265,7 +265,7 @@ public:
 		 * 3. Almacenar la media de la poblaciónfinal y la mejor solución
 		 */
 
-		initPopulation(_popsize);
+		initPopulation(_popSize);
 
 		while (stopCondition.reached() == false) {
 

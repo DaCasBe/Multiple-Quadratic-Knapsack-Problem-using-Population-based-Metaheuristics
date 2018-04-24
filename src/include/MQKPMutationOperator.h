@@ -56,7 +56,7 @@ public:
 	MQKPMutationOperator(double mutProb, MQKPInstance &instance){
 		_mutProb = mutProb;
 		_numObjs = instance.getNumObjs();
-		_numKnapsakcs = instance.getNumKnapsacks();
+		_numKnapsacks = instance.getNumKnapsacks();
 	}
 
 	/**
