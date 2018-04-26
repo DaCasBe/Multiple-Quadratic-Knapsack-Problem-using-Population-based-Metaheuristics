@@ -117,9 +117,10 @@ class MQKPAntColonyOpt: public MQKPMetaheuristic {
 					MQKPObjectAssignmentOperation *al =
 							new MQKPObjectAssignmentOperation();
 					double density = deltaFitness/instance->getWeight(indexObj); //Es el valor heuristico
-					double significance=pow(phMatrix[indexObj]->at(j),alpha)*pow(density,beta);
+					double relevance=pow(density,beta)*pow(phMatrix.at(indexObj)->at(j),alpha);
+					al->setValues(indexObj,j,deltaFitness);
 					alternatives.push_back(al);
-					significances.push_back(significance);
+					significances.push_back(relevance);
 				}
 			}
 		}
@@ -175,9 +176,9 @@ class MQKPAntColonyOpt: public MQKPMetaheuristic {
 					 * 2. Si es mejor que la mejor hasta ahora, guardarla en op
 					 */
 					double density = deltaFitness/instance->getWeight(indexObj); //Es el valor heuristico
-					double significance=pow(phMatrix[indexObj]->at(j),alpha)*pow(density,beta);
-					if(bestSignificance<significance){
-						bestSignificance=significance;
+					double relevance=pow(density,beta)*pow(phMatrix[indexObj]->at(j),alpha);
+					if(bestSignificance<relevance){
+						bestSignificance=relevance;
 						op.setValues(indexObj,j,deltaFitness);
 					}
 				}
@@ -229,15 +230,14 @@ class MQKPAntColonyOpt: public MQKPMetaheuristic {
 			 * 2. Asignarle un fitness igual a cero
 			 */
 
-			MQKPInstance *instance = _colony->_instance;
-			unsigned numKnapsacks = instance->getNumKnapsacks();
-			_objectsLeft.clear();
-			_sol->setFitness(0);
-			for(unsigned i=0;i<numKnapsacks;i++){
+			unsigned numObjs = _colony->_instance->getNumObjs();
+
+			for(unsigned i=0;i<numObjs;i++){
 
 				_sol->putObjectIn(i,0);
 				_objectsLeft.insert(i);
 			}
+			_sol->setFitness(0);
 
 
 		}
@@ -291,7 +291,8 @@ class MQKPAntColonyOpt: public MQKPMetaheuristic {
 			//TODO Si se seleccionó alguna alternativa, aplicarla a la solución y eliminar el objeto correspondiente de _objectsLeft
 			if (operation.getObj() >= 0) {
 				operation.apply(getSolution());
-				_objectsLeft.erase(operation.getKnapsack());
+				//operation.apply(*_sol);
+				_objectsLeft.erase(operation.getObj());
 			}
 		}
 
@@ -341,8 +342,7 @@ protected:
 	 * @param[in] op Opción que escogió la hormiga y donde se va a aplicar la actualización
 	 */
 	void localUpdate(MQKPObjectAssignmentOperation &op) {
-		// ? 1 menos evaparcion por la feromona en el instante anterior mas la evaporacion por el fitness de la inicial (alomejor me he liado con tanto parentesis)
-		(*_phMatrix[op.getObj()])[op.getKnapsack()] = (1 - _evaporation) * (*_phMatrix[op.getObj()])[op.getKnapsack()] + _evaporation * _initTau;
+		_phMatrix[op.getObj()]->at(op.getKnapsack()) = (1 - _evaporation) * _phMatrix[op.getObj()]->at(op.getKnapsack()) + _evaporation * _initTau;
 	}
 
 	/**
@@ -357,7 +357,7 @@ protected:
 		//TODO Resetear las soluciones de cada hormiga e insertar sus índices en movingAnts
 		for (auto ant : _ants) {
 			ant->resetSolution();
-			movingAnts.insert(i);  // ? No estoy seguro si sus indices es i o ant
+			movingAnts.insert(i);
 			i++;
 		}
 
@@ -371,10 +371,9 @@ protected:
 				MQKPObjectAssignmentOperation op;
 				op.setValues(-1, -1, 0);
 				
-				// ?  Aqui habia 3 puntos como si tuviesemos que completar con alguna funcion
-					ant->chooseOperation(op);
+				ant->chooseOperation(op);
 				//TODO Si la hormiga se ha movido, entonces aplicar la actualización local de feromona. Si no, apuntarla en stoppedAnts para eliminarla después de movingAnts
-				if (op.getObj() > -1) {
+				if (op.getObj() != -1) {
 					localUpdate(op);
 				} else {
 					stoppedAnts.insert(iAnt);
@@ -441,9 +440,7 @@ protected:
 
 		//TODO Para cada objeto, depositar feromona en el par objeto y mochila en la que está dicho objeto.
 		for (unsigned i = 0; i < numObjs; i++) {
-			// ? Despues de investigar (y si lo he entendido bien) lo que hay que hacer aqui es recorer la matriz de pheromonas y actualizarla, para ello accedemos 
-			// ? al objeto de la lista i y cambiamos la posicion de la mejor solucion por 1 menos evaparcion por la feromona en el instante anterior mas la evaporacion por el fitness de la mejor hormiga
-			(*_phMatrix[i])[_bestSolution->whereIsObject(i)] = (1 - _evaporation) * (*_phMatrix[i])[_bestSolution->whereIsObject(i)] + _evaporation * fitness;
+			_phMatrix.at(i)->at(_bestSolution->whereIsObject(i)) = (1 - _evaporation) * _phMatrix.at(i)->at(_bestSolution->whereIsObject(i)) + fitness;
 
 		}
 	}
@@ -527,7 +524,6 @@ public:
 
 		//TODO Creación de las hormigas
 		for (unsigned i = 0; i < numAnts; i++) {
-			// ? Aqui se crea nuevas hormigas, a la creacion de hormigas se le pasa una lista de candidatos y una colona, pongo this para referirme a la colonia actual ya que no encuentro otra forma
 			MQKPAnt *hormiga = new MQKPAnt(candidateListSize, this);
 			_ants.push_back(hormiga);
 		}
@@ -539,10 +535,9 @@ public:
 
 		for (unsigned i = 0; i < numObjs; i++) {
 			vector<double> *aVector = new vector<double>;
-			_phMatrix.push_back(aVector);						// ? No entiendo esto
+			_phMatrix.push_back(aVector);
 
 			for (unsigned j = 0; j < numKnapsacks; j++) {
-				// ? Aqui tenemos que poner el valor de pheromona inicial que se da como initTau, la cosa es que segun pone arriba en el protected no nos interesa que sea 0 y justo en la linea de antes mete en phMatrix un valor basura
 				aVector->push_back(_initTau);
 			}
 		}
