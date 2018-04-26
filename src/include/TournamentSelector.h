@@ -46,7 +46,7 @@ protected:
 
 		for(unsigned i=0;i<_k-1;i++){
 			Solution * sol;
-			sol=set[rand()%set.size()];
+			sol=set[rand()%(int)set.size()];
 
 			if(MQKPEvaluator::compare(sol->getFitness(),best->getFitness())>0){
 				best=sol;
@@ -80,15 +80,9 @@ public:
 
 		//TODO utilizando le método propio selectOne, seleccionar tantas parejas
 		//de padres como elementos hay en orig
-		vector <Solution*> set;
-		set.resize(0);
-
-		for(unsigned i=0;i<2*orig.size();i++){
-			for(unsigned j=0;j<_k;j++){
-				set.push_back(orig[rand()%orig.size()]);
-			}
-
-			result[i]=selectOne(set);
+		for(unsigned i=0;i<orig.size();i++){
+			result.push_back(selectOne(orig));
+			result.push_back(selectOne(orig));
 		}
 	}
 };

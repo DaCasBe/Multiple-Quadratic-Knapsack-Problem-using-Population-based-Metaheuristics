@@ -53,9 +53,9 @@ protected:
 			int parent;
 
 			for(unsigned i=0;i<_numObjs;i++){
-				parent=(rand()%2)+1;
+				parent=rand()%2;
 
-				if(parent==1){
+				if(parent==0){
 					sol->putObjectIn(i,sol1->whereIsObject(i));
 				}
 
@@ -95,10 +95,10 @@ public:
 
 		//TODO aplicar cruce entre cada dos padres consecutivos (1,2), (3,4), ...
 		for (unsigned i=0;i<numParents;i=i+2) {
-			if(i+1<numParents){
+			//if(i+1<numParents){
 				MQKPSolution *sol = cross(parents[i],parents[i+1]);
 				offspring.push_back(sol);
-			}
+			//}
 		}
 	}
 };

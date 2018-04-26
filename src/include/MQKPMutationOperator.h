@@ -41,8 +41,8 @@ protected:
 		//TODO Recorrer los objetos y, según la probabilidad de mutación,
 		//asignarlos a una mochila aleatoria (podrían modificarse 0, 1, o más de 1 gen)
 		for(unsigned i=0;i<_numObjs;i++){
-			if((rand()/RAND_MAX)<_mutProb){
-				s->putObjectIn(i,(rand()%_numKnapsacks)+1);
+			if(((double)rand()/RAND_MAX)<_mutProb){
+				s->putObjectIn(i,rand()%(_numKnapsacks+1));
 			}
 		}
 	}

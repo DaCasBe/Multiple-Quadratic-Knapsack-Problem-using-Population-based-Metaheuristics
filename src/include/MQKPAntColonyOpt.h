@@ -116,12 +116,11 @@ class MQKPAntColonyOpt: public MQKPMetaheuristic {
 					 */
 					MQKPObjectAssignmentOperation *al =
 							new MQKPObjectAssignmentOperation();
-					double density = deltaFitness/instance->getWeight(indexObj);
-					//double relevance=pow(density,beta)*pow(phMatrix[indexObj][j],alpha);
-					double relevancia=pow(phMatrix[indexObj]->at(numKnapsacks),alpha)*pow(density,beta);
-					significances.push_back(relevancia);
+					double density = deltaFitness/instance->getWeight(indexObj); //Es el valor heuristico
+					double significance=pow(phMatrix[indexObj]->at(j),alpha)*pow(density,beta);
 					alternatives.push_back(al);
-;				}
+					significances.push_back(significance);
+				}
 			}
 		}
 
@@ -176,9 +175,9 @@ class MQKPAntColonyOpt: public MQKPMetaheuristic {
 					 * 2. Si es mejor que la mejor hasta ahora, guardarla en op
 					 */
 					double density = deltaFitness/instance->getWeight(indexObj); //Es el valor heuristico
-					double relevancia=pow(phMatrix[indexObj]->at(j),alpha)*pow(density,beta);
-					if(bestSignificance<relevancia){
-						bestSignificance=relevancia;
+					double significance=pow(phMatrix[indexObj]->at(j),alpha)*pow(density,beta);
+					if(bestSignificance<significance){
+						bestSignificance=significance;
 						op.setValues(indexObj,j,deltaFitness);
 					}
 				}
@@ -343,7 +342,7 @@ protected:
 	 */
 	void localUpdate(MQKPObjectAssignmentOperation &op) {
 		// ? 1 menos evaparcion por la feromona en el instante anterior mas la evaporacion por el fitness de la inicial (alomejor me he liado con tanto parentesis)
-		(*_phMatrix[op.getObj()])[op.getKnapsack()] =  (1 - _evaporation) * (*_phMatrix[op.getObj()])[op.getKnapsack()] + _evaporation * _initTau;
+		(*_phMatrix[op.getObj()])[op.getKnapsack()] = (1 - _evaporation) * (*_phMatrix[op.getObj()])[op.getKnapsack()] + _evaporation * _initTau;
 	}
 
 	/**

@@ -61,12 +61,10 @@ protected:
 	unsigned indexBest(vector<Solution*> &set) {
 
 		//TODO buscar el índice de la mejor solución en set
-		Solution * best=set[0];
 		unsigned indexBest=0;
 
 		for(unsigned i=1;i<set.size();i++){
-			if(set[i]->getFitness()>best->getFitness()){
-				best=set[i];
+			if(MQKPEvaluator::compare(set[i]->getFitness(),set[indexBest]->getFitness())>0){
 				indexBest=i;
 			}
 		}
@@ -82,12 +80,10 @@ protected:
 	unsigned indexWorst(vector<Solution*> &set) {
 
 		//TODO buscar el índice de la peor solución en set
-		Solution * worst=set[0];
 		unsigned indexWorst=0;
 
 		for(unsigned i=1;i<set.size();i++){
-			if(set[i]->getFitness()<worst->getFitness()){
-				worst=set[i];
+			if(MQKPEvaluator::compare(set[i]->getFitness(),set[indexWorst]->getFitness())<0){
 				indexWorst=i;
 			}
 		}
@@ -119,7 +115,7 @@ protected:
 		unsigned int indexBestOff = indexBest(offspring);
 
 		if(MQKPEvaluator::compare(_population[indexBestPop]->getFitness(),offspring[indexBestOff]->getFitness())>0){
-			offspring[indexWorst(offspring)]=_population[indexBestPop];
+			offspring[indexWorst(offspring)]->copy(*_population[indexBestPop]);
 		}
 
 		//Eliminar los individuos de la población actual
@@ -188,13 +184,20 @@ protected:
 		 * 3. Actualizar la mejor solución _bestSolution
 		 * 4. Insertarlas en la población
 		 */
-		MQKPSolution *sol;
-		sol=new MQKPSolution(*_instance);
-		double fitness;
+
+		double fitness=0;
 
 		for (unsigned i = 0; i < popSize; i++) {
+			MQKPSolution *sol;
+			sol=new MQKPSolution(*_instance);
+
 			MQKPSolGenerator::genRandomSol(*_instance,*sol);
+
 			fitness=MQKPEvaluator::computeFitness(*_instance,*sol);
+			sol->setFitness(fitness);
+			if(MQKPEvaluator::compare(fitness,_bestSolution->getFitness())>0){
+				_bestSolution->copy(*sol);
+			}
 
 			_results.push_back(fitness);
 			_population.push_back(sol);
@@ -279,11 +282,10 @@ public:
 			vector<Solution*> offspring;
 			_crossoverOp->cross(parents,offspring);
 
-			_offMeanResults.push_back(computeMeanFitness(offspring));
-
 			_mutOp->mutate(offspring);
 
-			computeMeanFitness(offspring);
+			evaluate(offspring);
+			_offMeanResults.push_back(computeMeanFitness(offspring));
 
 			selectNewPopulation(offspring);
 
